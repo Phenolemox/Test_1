@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мистическое предсказание</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: radial-gradient(circle at top, #23123a, #0c0716 70%);
+            color: #f3eaff;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(680px, 100%);
+            background: rgba(17, 10, 32, 0.88);
+            border: 1px solid rgba(179, 142, 255, 0.35);
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+            padding: 24px;
+        }
+
+        h1 { margin-top: 0; font-size: 1.7rem; }
+        p { line-height: 1.55; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        input {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(179, 142, 255, 0.45);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #9f6dff, #6a9bff);
+            color: #fff;
+            font-size: 1rem;
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+
+        .error { color: #ffb4b4; margin-top: 8px; }
+
+        .result {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(74, 45, 121, 0.35);
+            border: 1px solid rgba(195, 167, 255, 0.45);
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Оракул трёх слов</h1>
+    <p>Введи три слова. Я не повторю их напрямую, но соберу из них образное мистическое предсказание.</p>
+
+    <form id="oracle-form">
+        <div class="grid">
+            <input type="text" name="word1" maxlength="40" placeholder="Первое слово" required>
+            <input type="text" name="word2" maxlength="40" placeholder="Второе слово" required>
+            <input type="text" name="word3" maxlength="40" placeholder="Третье слово" required>
+        </div>
+
+        <button type="submit">Узнать предсказание</button>
+        <div class="error" id="error" hidden></div>
+    </form>
+
+    <div class="result" id="result" hidden></div>
+</div>
+
+<script>
+    const images = [
+        'древняя арка',
+        'серебряная река',
+        'тихий маяк',
+        'кристальный сад',
+        'огненная спираль',
+        'лунный мост',
+        'янтарная тропа',
+        'зеркальная башня',
+    ];
+
+    const energies = [
+        'шёпот перемен',
+        'дыхание нового цикла',
+        'память прошлого света',
+        'знак скрытой удачи',
+        'импульс храброго шага',
+        'спокойствие внутренней силы',
+    ];
+
+    const form = document.getElementById('oracle-form');
+    const error = document.getElementById('error');
+    const result = document.getElementById('result');
+
+    function normalizeWord(word) {
+        return word.trim().replace(/\s+/g, ' ').slice(0, 40);
+    }
+
+    function startsWithVowel(word) {
+        const first = word.charAt(0).toLowerCase();
+        return ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'a', 'e', 'i', 'o', 'u', 'y'].includes(first);
+    }
+
+    function hash(input) {
+        let h = 0;
+        for (let i = 0; i < input.length; i += 1) {
+            h = (h * 31 + input.charCodeAt(i)) >>> 0;
+        }
+        return h;
+    }
+
+    function mysticalPrediction(words) {
+        const [first, second, third] = words;
+
+        const firstImage = images[hash(first.toLowerCase()) % images.length];
+        const secondImage = images[hash(second.toLowerCase()) % images.length];
+        const thirdImage = images[hash(third.toLowerCase()) % images.length];
+
+        const firstEnergy = energies[hash((first + second).toLowerCase()) % energies.length];
+        const secondEnergy = energies[hash((second + third).toLowerCase()) % energies.length];
+
+        const tone = startsWithVowel(first)
+            ? 'Ответ явится мягко, но очень точно.'
+            : 'Ответ придёт резко, как вспышка на горизонте.';
+
+        return `В сумерках перед тобой появляются ${firstImage}, ${secondImage} и ${thirdImage}. ` +
+            `Они сплетаются в ${firstEnergy} и пробуждают ${secondEnergy}. ` +
+            `${tone} В течение ближайших 7 дней следуй за знаком, который повторится трижды.`;
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const words = [
+            normalizeWord(form.word1.value),
+            normalizeWord(form.word2.value),
+            normalizeWord(form.word3.value),
+        ];
+
+        if (words.some((word) => word.length === 0)) {
+            error.textContent = 'Пожалуйста, введи все 3 слова.';
+            error.hidden = false;
+            result.hidden = true;
+            return;
+        }
+
+        error.hidden = true;
+        result.textContent = mysticalPrediction(words);
+        result.hidden = false;
+    });
+</script>
+</body>
+</html>
