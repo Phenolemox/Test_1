@@ -1,1 +1,70 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Биржа материалов</title><style>*{box-sizing:border-box}body{margin:0;background:#090b12;color:#f5f7ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:520px;margin:auto;padding:16px 12px 80px}.top{display:flex;justify-content:space-between;gap:10px;align-items:center}.bal,.card{background:#151927;border:1px solid #293149;border-radius:20px;padding:14px;margin:12px 0}.bal{text-align:right;min-width:120px}.bal b{font-size:24px}.tabs{position:sticky;top:0;background:#090b12;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 0}.tab,button{border:0;border-radius:14px;padding:12px;font-weight:900;color:#fff;background:#2c354f}.tab.active{background:#ff3046}.panel{display:none}.panel.active{display:block}.coin{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:900}.gold{background:linear-gradient(135deg,#7a4a00,#ffd36a)}.silver{background:linear-gradient(135deg,#677083,#dce4f2);color:#111}.bronze{background:linear-gradient(135deg,#6b351d,#d88b55)}.diamond{background:linear-gradient(135deg,#006c9e,#7ddcff);border-radius:18px;transform:rotate(45deg)}.diamond span{transform:rotate(-45deg)}.asset{display:grid;grid-template-columns:58px 1fr;gap:12px;align-items:center}.meta,.small{color:#8d96ad;font-size:13px}.grid,.actions,.admin{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.stat{background:#0e1320;border-radius:14px;padding:10px}.stat b{display:block;font-size:18px}.buy{background:#31d07b;color:#06130b}.sell{background:#ff3046}input{width:100%;border:1px solid #293149;background:#0e1320;color:#fff;border-radius:12px;padding:11px;font-size:16px}label{display:block;color:#8d96ad;font-size:12px;margin:8px 0 4px}.toast{position:fixed;left:12px;right:12px;bottom:14px;background:#111727;border:1px solid #293149;border-radius:16px;padding:12px;display:none}.toast.show{display:block}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #293149;padding:8px;text-align:left}</style></head><body><div class="wrap"><div class="top"><div><h1>Биржа материалов</h1><div class="small">покупай, продавай, управляй рынком</div></div><div class="bal"><div class="small">Баланс</div><b id="balance"></b></div></div><div class="tabs"><button class="tab active" data-tab="market">Биржа</button><button class="tab" data-tab="cabinet">ЛК</button><button class="tab" data-tab="admin">Админ</button></div><section id="market" class="panel active"></section><section id="cabinet" class="panel"></section><section id="admin" class="panel"></section></div><div id="toast" class="toast"></div><script>const D={balance:2000,assets:{gold:{name:'Золото',icon:'Au',cls:'gold',nominal:100,price:100,stock:null,user:1},silver:{name:'Серебро',icon:'Ag',cls:'silver',nominal:200,price:200,stock:null,user:1},bronze:{name:'Бронза',icon:'Br',cls:'bronze',nominal:500,price:500,stock:null,user:1},diamond:{name:'Алмазы',icon:'◆',cls:'diamond',nominal:1000,price:1000,stock:null,user:1}}};let S=load();function clone(o){return JSON.parse(JSON.stringify(o))}function load(){try{return JSON.parse(localStorage.getItem('coinExchangeGameRoot'))||clone(D)}catch(e){return clone(D)}}function save(){localStorage.setItem('coinExchangeGameRoot',JSON.stringify(S));render()}function m(n){return Math.round(+n||0).toLocaleString('ru-RU')}function sp(a){return Math.round(a.nominal*.9)}function msg(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1400)}function buy(k){let a=S.assets[k];if(a.stock!==null&&a.stock<=0)return msg('Лимит на бирже закончился');if(S.balance<a.price)return msg('Не хватает баллов');S.balance-=a.price;a.user++;if(a.stock!==null)a.stock--;save();msg('Куплено: '+a.name)}function sell(k){let a=S.assets[k];if(a.user<=0)return msg('Нечего продавать');a.user--;S.balance+=sp(a);if(a.stock!==null)a.stock++;save();msg('Продано за '+m(sp(a)))}function adm(k,f,v){let a=S.assets[k];if(f==='price')a.price=Math.max(0,Math.round(+v||0));else a.stock=String(v).trim()===''?null:Math.max(0,Math.round(+v||0));save()}function reset(){S=clone(D);save();msg('Игра сброшена')}function coin(a){return `<div class="coin ${a.cls}"><span>${a.icon}</span></div>`}function render(){balance.textContent=m(S.balance);market.innerHTML=Object.entries(S.assets).map(([k,a])=>`<div class="card"><div class="asset">${coin(a)}<div><h3>${a.name}</h3><div class="meta">Номинал ${m(a.nominal)} · продажа ${m(sp(a))} · цена ${m(a.price)}</div></div></div><div class="grid"><div class="stat"><span class="small">У тебя</span><b>${m(a.user)}</b></div><div class="stat"><span class="small">Лимит</span><b>${a.stock===null?'∞':m(a.stock)}</b></div></div><div class="actions"><button class="buy" onclick="buy('${k}')">Купить</button><button class="sell" onclick="sell('${k}')">Продать</button></div></div>`).join('');let total=Object.values(S.assets).reduce((s,a)=>s+a.user*sp(a),0);cabinet.innerHTML=`<div class="card"><h2>Личный кабинет</h2><div class="grid"><div class="stat"><span class="small">Баланс</span><b>${m(S.balance)}</b></div><div class="stat"><span class="small">Портфель</span><b>${m(total)}</b></div></div></div><div class="card"><table><tr><th>Материал</th><th>Кол-во</th><th>Сумма продажи</th></tr>${Object.values(S.assets).map(a=>`<tr><td>${a.name}</td><td>${m(a.user)}</td><td>${m(a.user*sp(a))}</td></tr>`).join('')}</table></div>`;admin.innerHTML=`<div class="card"><h2>Админ-таблица</h2><div class="small">Цена = покупка на бирже. Лимит пустой = бесконечно.</div></div>`+Object.entries(S.assets).map(([k,a])=>`<div class="card"><div class="asset">${coin(a)}<div><h3>${a.name}</h3><div class="meta">Продажа пользователя: ${m(sp(a))}</div></div></div><div class="admin"><div><label>Цена покупки</label><input type="number" value="${a.price}" onchange="adm('${k}','price',this.value)"></div><div><label>Лимит единиц</label><input type="number" placeholder="∞" value="${a.stock===null?'':a.stock}" onchange="adm('${k}','stock',this.value)"></div></div></div>`).join('')+`<button onclick="reset()">Сбросить игру</button>`}document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')});render();</script></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Квиз-калькулятор стоимости</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0b1020;color:#f4f7fb}main{max-width:980px;margin:auto;padding:28px 18px 60px}.hero{padding:50px 0}.tag{color:#25d7a1;text-transform:uppercase;font-weight:800;letter-spacing:.12em;font-size:13px}h1{font-size:clamp(38px,7vw,72px);line-height:.95;margin:10px 0 18px}h2{font-size:32px;margin:0 0 16px}.lead{font-size:20px;color:#aab6d3;max-width:720px;line-height:1.55}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card,.quiz{background:#111a33;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.25)}.btn{border:0;border-radius:999px;padding:14px 22px;font-weight:800;cursor:pointer;background:#7c5cff;color:white}.btn.secondary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}.actions{display:flex;gap:10px;justify-content:space-between;margin-top:20px}.progress{height:10px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin:16px 0 26px}.bar{height:100%;width:0;background:linear-gradient(90deg,#7c5cff,#25d7a1);transition:.2s}.option{display:flex;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;margin:10px 0;background:rgba(255,255,255,.04);cursor:pointer}.option b{margin-left:auto;color:#25d7a1}.hidden{display:none}.form{display:grid;gap:12px;max-width:520px}.form input{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;font-size:16px}.ok{background:rgba(37,215,161,.12);border:1px solid rgba(37,215,161,.35);padding:16px;border-radius:16px;margin-top:14px;color:#dff}.muted{color:#aab6d3;line-height:1.6}@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:42px}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="tag">Готовый инструмент для заявок</div>
+    <h1>Квиз-калькулятор, который собирает заявки</h1>
+    <p class="lead">Клиент отвечает на 6 вопросов, видит примерную стоимость и оставляет контакты. После подключения Apps Script заявка будет падать в Google Sheets.</p>
+    <button class="btn" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Попробовать демо</button>
+  </section>
+
+  <section class="grid">
+    <div class="card"><h3>Вопросы из таблицы</h3><p class="muted">Вопросы и цены меняются в Google Sheets.</p></div>
+    <div class="card"><h3>Расчёт цены</h3><p class="muted">Каждый вариант добавляет сумму к расчёту.</p></div>
+    <div class="card"><h3>Заявка в CRM</h3><p class="muted">Контакты сохраняются в листе «Заявки».</p></div>
+  </section>
+
+  <section class="quiz" id="quiz" style="margin-top:40px">
+    <div class="tag" id="counter">1 / 6</div>
+    <h2 id="questionTitle"></h2>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div id="options"></div>
+    <div id="final" class="hidden">
+      <h2 id="price"></h2>
+      <p class="muted">Точная стоимость после уточнения деталей.</p>
+      <form class="form" id="leadForm">
+        <input id="name" required placeholder="Имя">
+        <input id="phone" required placeholder="Телефон">
+        <input id="email" type="email" placeholder="Email">
+        <button class="btn" type="submit">Отправить заявку</button>
+      </form>
+      <div class="ok hidden" id="ok"></div>
+    </div>
+    <div class="actions">
+      <button class="btn secondary" id="prev">Назад</button>
+      <button class="btn" id="next">Далее</button>
+    </div>
+  </section>
+
+  <section style="margin-top:40px">
+    <h2>Тарифы внедрения</h2>
+    <div class="grid">
+      <div class="card"><h3>Старт</h3><h2>5 000 ₽</h2><p class="muted">Базовая настройка.</p></div>
+      <div class="card"><h3>Стандарт</h3><h2>12 000 ₽</h2><p class="muted">Квиз + таблица + тексты.</p></div>
+      <div class="card"><h3>Премиум</h3><h2>25 000 ₽</h2><p class="muted">Брендирование и запуск.</p></div>
+    </div>
+  </section>
+</main>
+<script>
+const SCRIPT_URL='';
+const qs=[
+ {t:'Что нужно рассчитать?',o:[['Лендинг / простая услуга',5000],['Корпоративный сайт / средний проект',15000],['Интернет-магазин / сложный проект',30000]]},
+ {t:'Количество страниц или объём работ?',o:[['1–3 страницы / небольшой объём',0],['4–10 страниц / средний объём',5000],['11–30 страниц / большой объём',12000],['Больше 30 страниц',25000]]},
+ {t:'Нужен ли индивидуальный дизайн?',o:[['Шаблонный дизайн',0],['Индивидуальный дизайн',10000]]},
+ {t:'Нужны ли интеграции?',o:[['Без интеграций',0],['Форма + таблица заявок',5000],['CRM / оплата / внешние сервисы',15000]]},
+ {t:'Нужен ли контент или тексты?',o:[['Контент уже готов',0],['Нужна редактура',5000],['Нужно написать тексты с нуля',12000]]},
+ {t:'Как срочно нужен запуск?',o:[['Стандартно',0],['Срочно',7000]]}
+];
+let step=0,answers=[];const $=id=>document.getElementById(id);function money(n){return n.toLocaleString('ru-RU')+' ₽'}function sum(){return answers.reduce((s,a)=>s+(a?a.price:0),0)}function render(){const q=qs[step];$('counter').textContent=(step+1)+' / '+qs.length;$('bar').style.width=((step+1)/qs.length*100)+'%';$('questionTitle').textContent=q.t;$('final').classList.add('hidden');$('options').classList.remove('hidden');$('next').classList.remove('hidden');$('prev').disabled=step===0;$('next').textContent=step===qs.length-1?'Рассчитать':'Далее';$('options').innerHTML=q.o.map((x,i)=>`<label class="option"><input type="radio" name="opt" value="${i}" ${answers[step]?.idx===i?'checked':''}><span>${x[0]}</span><b>${x[1]?'+ '+money(x[1]):'0 ₽'}</b></label>`).join('');document.querySelectorAll('[name=opt]').forEach(i=>i.onchange=()=>{const v=q.o[+i.value];answers[step]={idx:+i.value,text:v[0],price:v[1],question:q.t}})}function final(){ $('questionTitle').textContent='Готово';$('counter').textContent='Расчёт';$('bar').style.width='100%';$('options').classList.add('hidden');$('final').classList.remove('hidden');$('next').classList.add('hidden');$('price').textContent='Предварительная стоимость: '+money(sum()) }$('prev').onclick=()=>{if(step>0){step--;render()}};$('next').onclick=()=>{if(!answers[step])return alert('Выберите вариант'); if(step<qs.length-1){step++;render()}else final()};$('leadForm').onsubmit=e=>{e.preventDefault();const data={id:'LOCAL-'+Date.now(),name:$('name').value,phone:$('phone').value,email:$('email').value,price:sum(),answers};if(!SCRIPT_URL){$('ok').classList.remove('hidden');$('ok').innerHTML='Демо-режим: заявка не отправлена, потому что Apps Script URL ещё не подключён. Расчёт: '+money(data.price);return}const form=document.createElement('form');form.method='POST';form.action=SCRIPT_URL;form.target='_blank';const input=document.createElement('input');input.name='payload';input.value=JSON.stringify(data);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();$('ok').classList.remove('hidden');$('ok').textContent='Заявка отправлена.'};render();
+</script>
+</body>
+</html>
