@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Квиз-калькулятор стоимости</title>
+  <meta name="description" content="Универсальный квиз-калькулятор для малого бизнеса: заявки, расчёт цены и Google Sheets CRM." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <div class="logo">QuizCalc</div>
+      <a class="nav-link" href="#order">Заказать настройку</a>
+    </nav>
+
+    <section class="hero-grid">
+      <div>
+        <p class="eyebrow">Готовый инструмент для заявок</p>
+        <h1>Квиз-калькулятор, который собирает заявки</h1>
+        <p class="hero-text">Клиент отвечает на 6 вопросов, видит примерную стоимость и оставляет контакты. Заявка падает в Google Sheets, владелец получает уведомление.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#quiz">Попробовать демо</a>
+          <a class="button secondary" href="#pricing">Тарифы</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <span class="card-label">Для ниш</span>
+        <ul>
+          <li>ремонт квартир</li>
+          <li>клининг</li>
+          <li>мебель на заказ</li>
+          <li>создание сайтов</li>
+          <li>обучение и мероприятия</li>
+        </ul>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="section" id="problem">
+      <h2>Проблема</h2>
+      <p>Малый бизнес теряет заявки, потому что клиенту неудобно звонить и ждать смету. Квиз снимает первые вопросы автоматически и оставляет только тёплые контакты.</p>
+    </section>
+
+    <section class="section cards" id="solution">
+      <article class="info-card"><h3>1. Вопросы из таблицы</h3><p>Вопросы и цены меняются в Google Sheets без переписывания кода.</p></article>
+      <article class="info-card"><h3>2. Расчёт цены</h3><p>Каждый вариант добавляет или убирает сумму. Клиент видит ориентир.</p></article>
+      <article class="info-card"><h3>3. Заявка в CRM</h3><p>Контакты, ответы и цена сохраняются в листе «Заявки».</p></article>
+    </section>
+
+    <section class="quiz-shell" id="quiz">
+      <div class="quiz-header">
+        <div>
+          <p class="eyebrow">Демо-квиз</p>
+          <h2>Рассчитайте примерную стоимость</h2>
+        </div>
+        <div id="stepCounter" class="step-counter">1 / 6</div>
+      </div>
+
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+
+      <div id="quizStep" class="quiz-step"></div>
+
+      <div class="quiz-actions">
+        <button id="prevBtn" class="button secondary" type="button">Назад</button>
+        <button id="nextBtn" class="button primary" type="button">Далее</button>
+      </div>
+
+      <section id="finalScreen" class="final hidden">
+        <p class="eyebrow">Предварительный расчёт</p>
+        <h2 id="priceResult">0 ₽</h2>
+        <p>Точная стоимость после уточнения деталей.</p>
+
+        <form id="leadForm" class="lead-form">
+          <label>Имя<input id="clientName" name="name" type="text" required placeholder="Иван" /></label>
+          <label>Телефон<input id="clientPhone" name="phone" type="tel" required placeholder="+7 999 000-00-00" /></label>
+          <label>Email<input id="clientEmail" name="email" type="email" placeholder="mail@example.com" /></label>
+          <button class="button primary" type="submit">Отправить заявку</button>
+        </form>
+
+        <div id="successBox" class="success hidden"></div>
+      </section>
+    </section>
+
+    <section class="section pricing" id="pricing">
+      <h2>Тарифы внедрения</h2>
+      <div class="cards">
+        <article class="price-card"><h3>Старт</h3><strong>5 000 ₽</strong><p>Базовая установка квиза и таблицы.</p></article>
+        <article class="price-card featured"><h3>Стандарт</h3><strong>12 000 ₽</strong><p>Настройка вопросов, текстов, Google Sheets и уведомлений.</p></article>
+        <article class="price-card"><h3>Премиум</h3><strong>25 000 ₽</strong><p>Брендирование, нишевые тексты, расширенная логика и запуск.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="order">
+      <h2>Как проходит внедрение</h2>
+      <ol class="steps">
+        <li>Выбирается ниша и набор вопросов.</li>
+        <li>В Google Sheets вносятся варианты и цены.</li>
+        <li>Apps Script подключает таблицу к сайту.</li>
+        <li>Сайт публикуется через GitHub Pages.</li>
+        <li>Оплата клиентов принимается вручную переводом на карту.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Квиз-калькулятор для заявок. MVP без платёжных систем.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
