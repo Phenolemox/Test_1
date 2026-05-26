@@ -1,197 +1,89 @@
-# Квиз-калькулятор стоимости для малого бизнеса
+# Quiz Calculator — отдельный проект квиз-калькулятора
 
-Готовый MVP инструмента для сбора заявок через квиз с расчётом примерной стоимости. Проект сделан под GitHub Pages + Google Sheets + Google Apps Script.
+Это отдельный проект внутри репозитория `Phenolemox/Test_1`.
 
-## Что уже создано
+Важно: он не заменяет и не ломает другие проекты в репозитории.
 
-- Фронтенд сайта: `index.html`, `styles.css`, `app.js`.
-- Backend-код для Google Apps Script: `Code.gs`.
-- Google Sheets CRM: `Quiz Calculator CRM`.
-- Google Docs handoff-документ: `Quiz Calculator — Agent Handoff`.
-- Стартовая конфигурация квиза на 6 вопросов.
-- Логика ручной оплаты: клиент получает расчёт, оставляет заявку, владелец принимает оплату переводом на карту вручную.
-
-## Ссылки проекта
-
-- GitHub repo: `https://github.com/Phenolemox/Test_1`
-- Папка проекта в repo: `quiz-calculator/`
-- Ожидаемый GitHub Pages URL: `https://phenolemox.github.io/Test_1/quiz-calculator/`
-- Google Sheets CRM: `https://docs.google.com/spreadsheets/d/1Rif5Mn_Xxe2W29p6vUCKNo4NGGPNQDBM7GhkduoUXm0/edit`
-- Google Docs handoff: `https://docs.google.com/document/d/1Wr5YokGDyuT-tKHhufVSHv3QIf1tUnY0TFimWWG52wc/edit`
-
-## Архитектура
+## Разделение проектов
 
 ```text
-GitHub Pages сайт
-        ↓
-app.js загружает конфигурацию квиза из Apps Script
-        ↓
-пользователь проходит 6 шагов и оставляет контакты
-        ↓
-Apps Script записывает заявку в Google Sheets
-        ↓
-владелец получает email-уведомление
-        ↓
-оплата принимается вручную переводом на карту
+/                         — старый проект «Оракул трёх слов»
+/coin-exchange-game/      — отдельный проект Coin Exchange Game
+/quiz-calculator/         — отдельный проект Quiz Calculator
 ```
 
-## Файлы
+## Где открывать квиз
+
+После включения GitHub Pages от ветки `main` и папки `/root` квиз должен открываться здесь:
 
 ```text
-quiz-calculator/
-├── index.html              # страница лендинга и квиза
-├── styles.css              # визуальный стиль
-├── app.js                  # логика квиза, расчёт цены, отправка заявки
-├── Code.gs                 # Google Apps Script backend
-├── README.md               # эта инструкция
-├── docs/
-│   └── SALES_SCRIPTS.md    # скрипты продаж по нишам
-└── seed-data/
-    ├── apartment-repair.tsv
-    ├── website-creation.tsv
-    └── cleaning.tsv
+https://phenolemox.github.io/Test_1/quiz-calculator/
 ```
 
-## Как запустить
+Корневой адрес ниже остаётся старым проектом, это нормально:
 
-### 1. Проверить Google Sheets
+```text
+https://phenolemox.github.io/Test_1/
+```
 
-Откройте таблицу:
+## Что уже есть
 
-`https://docs.google.com/spreadsheets/d/1Rif5Mn_Xxe2W29p6vUCKNo4NGGPNQDBM7GhkduoUXm0/edit`
+```text
+quiz-calculator/index.html         — лендинг + квиз, весь фронтенд внутри одного файла
+quiz-calculator/Code.gs            — Google Apps Script backend
+quiz-calculator/README.md          — эта инструкция
+quiz-calculator/docs/SALES_SCRIPTS.md
+quiz-calculator/seed-data/apartment-repair.tsv
+quiz-calculator/seed-data/website-creation.tsv
+quiz-calculator/seed-data/cleaning.tsv
+```
 
-В ней должны быть листы:
+`index.html` сейчас сделан автономным: стили и клиентская логика находятся внутри файла. Это снижает риск поломки из-за отсутствующих `styles.css` или `app.js`.
 
-- `Заявки`
-- `Вопросы`
-- `Варианты`
-- `Настройки`
-- `Тарифы`
+## Google Sheets CRM
 
-Если структура сломана, откройте Apps Script и запустите функцию `setupInitialSheets()`.
+```text
+https://docs.google.com/spreadsheets/d/1Rif5Mn_Xxe2W29p6vUCKNo4NGGPNQDBM7GhkduoUXm0/edit
+```
 
-### 2. Подключить Apps Script
+## Как подключить отправку заявок
 
-1. Откройте Google Sheets CRM.
-2. Нажмите `Extensions → Apps Script`.
-3. Вставьте код из файла `quiz-calculator/Code.gs`.
-4. Сохраните проект.
-5. Запустите функцию `setupInitialSheets()` один раз.
-6. Нажмите `Deploy → New deployment`.
-7. Выберите тип `Web app`.
-8. Настройки:
+1. Открой Google Sheets CRM.
+2. Нажми `Extensions → Apps Script`.
+3. Вставь код из файла `quiz-calculator/Code.gs`.
+4. Сохрани.
+5. Запусти функцию `setupInitialSheets`.
+6. Нажми `Deploy → New deployment → Web app`.
+7. Настройки:
    - Execute as: `Me`
    - Who has access: `Anyone`
-9. Скопируйте URL, который заканчивается на `/exec`.
+8. Скопируй URL, который заканчивается на `/exec`.
+9. Передай этот URL ассистенту, чтобы он вставил его в `SCRIPT_URL` внутри `quiz-calculator/index.html`.
 
-### 3. Вставить Web App URL в сайт
+## Как работает MVP
 
-Откройте файл:
+Пока `SCRIPT_URL` пустой, квиз работает в демо-режиме:
 
-`quiz-calculator/app.js`
+- открывается;
+- переключает вопросы;
+- считает примерную стоимость;
+- показывает форму заявки;
+- не отправляет данные в Google Sheets.
 
-Найдите строку:
+После вставки Apps Script URL:
 
-```js
-const SCRIPT_URL = "";
-```
+- заявка будет отправляться в Apps Script;
+- Apps Script будет записывать заявку в лист `Заявки`;
+- владелец будет получать уведомление на email.
 
-Вставьте URL Apps Script:
+## Модель оплаты
 
-```js
-const SCRIPT_URL = "https://script.google.com/macros/s/.../exec";
-```
+Платёжные системы не подключены. Клиент оставляет заявку, владелец связывается с ним и принимает оплату вручную переводом на карту.
 
-Сделайте commit.
-
-### 4. Включить GitHub Pages
-
-1. Откройте repo `Phenolemox/Test_1`.
-2. Перейдите в `Settings → Pages`.
-3. Source: `Deploy from a branch`.
-4. Branch: `main`.
-5. Folder: `/root`.
-6. После включения сайт будет доступен здесь:
-
-`https://phenolemox.github.io/Test_1/quiz-calculator/`
-
-## Как менять вопросы
-
-В Google Sheets откройте лист `Вопросы`.
-
-Колонки:
-
-- `question_id` — ID вопроса.
-- `question_text` — текст вопроса.
-- `question_type` — пока используйте `single`.
-- `sort_order` — порядок показа.
-- `is_active` — `TRUE`, если вопрос активен.
-
-## Как менять варианты и цены
-
-В Google Sheets откройте лист `Варианты`.
-
-Колонки:
-
-- `option_id` — ID варианта.
-- `question_id` — ID вопроса, к которому относится вариант.
-- `option_text` — текст варианта.
-- `price_modifier` — сколько рублей добавляет вариант.
-- `sort_order` — порядок варианта.
-- `is_active` — `TRUE`, если вариант активен.
-
-## Как работает заявка
-
-Пользователь проходит квиз, вводит имя, телефон и email. Данные сохраняются в лист `Заявки`:
-
-- ID
-- дата
-- имя
-- телефон
-- email
-- ответы
-- расчётная цена
-- статус
-- комментарий
-
-Владелец получает уведомление на email `xafizzov.work@gmail.com`.
-
-## Как принимать оплату вручную
-
-В текущем MVP нет платёжной системы. Схема такая:
-
-1. Клиент оставляет заявку.
-2. Вы видите расчётную стоимость.
-3. Вы связываетесь с клиентом.
-4. Вы уточняете детали.
-5. Клиент переводит деньги на карту.
-6. Вы вручную меняете статус заявки в Google Sheets.
-
-## Что делать агенту в следующем чате
-
-Скопируйте в режим агента:
+## Тарифы продажи
 
 ```text
-Продолжи работу с проектом Quiz Calculator.
-
-Данные проекта:
-- GitHub repo: Phenolemox/Test_1
-- Папка проекта: quiz-calculator
-- Google Sheets CRM: https://docs.google.com/spreadsheets/d/1Rif5Mn_Xxe2W29p6vUCKNo4NGGPNQDBM7GhkduoUXm0/edit
-- Google Docs handoff: https://docs.google.com/document/d/1Wr5YokGDyuT-tKHhufVSHv3QIf1tUnY0TFimWWG52wc/edit
-
-Задачи:
-1. Проверь файлы в GitHub.
-2. Проверь структуру Google Sheets CRM.
-3. Если Apps Script ещё не развернут, помоги развернуть Web App.
-4. Вставь Web App URL в app.js.
-5. Проверь GitHub Pages URL.
-6. Протестируй отправку заявки.
-7. Подготовь короткую инструкцию для продажи клиентам.
+Старт      — 5 000 ₽
+Стандарт   — 12 000 ₽
+Премиум    — 25 000 ₽
 ```
-
-## Ограничения
-
-- Это MVP без автоматических платежей.
-- Расчётная цена не является финальной офертой.
-- Для публичного запуска нужно вручную развернуть Google Apps Script Web App и вставить его URL в `app.js`.
